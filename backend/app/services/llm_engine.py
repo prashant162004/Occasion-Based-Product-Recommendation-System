@@ -50,7 +50,7 @@ class LLMEngine:
     Expands user intent and synthesizes context-aware recommendation rationales.
     Features automated resilient fallback when external API credentials are not set.
     """
-    def __init__(self, api_key: Optional[str] = None, model_name: str = "gemini-1.5-flash"):
+    def __init__(self, api_key: Optional[str] = None, model_name: str = "gemini-3.5-flash-lite"):
         self.api_key = api_key or os.getenv("LLM_API_KEY", os.getenv("GEMINI_API_KEY", ""))
         self.model_name = model_name
         self.client = None
@@ -60,9 +60,9 @@ class LLMEngine:
         if self.api_key:
             try:
                 import google.generativeai as genai
-                genai.configure(api_key=self.api_key)
+                genai.configure(api_key=self.api_key, transport="rest")
                 self.client = genai.GenerativeModel(self.model_name)
-                logger.info("[INFO] External AI reasoning provider initialized.")
+                logger.info(f"[INFO] External AI reasoning provider initialized ({self.model_name}).")
             except Exception as e:
                 logger.warning(f"[WARNING] External AI provider initialization notice ({e}). Operating in deterministic engine mode.")
                 self.client = None
