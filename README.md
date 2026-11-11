@@ -126,7 +126,7 @@ files = payload.get("files", [])
 - **Vector Database**: Embedded disk-backed **Qdrant** (`qdrant-client`).
 - **Bi-Encoder Embeddings**: `BAAI/bge-m3` (1024-dimensional normalized dense vectors via `sentence-transformers`).
 - **Cross-Encoder Re-ranker**: `cross-encoder/ms-marco-MiniLM-L-6-v2` for cross-attention scoring.
-- **LLM Engine**: Google Gemini (`gemini-1.5-flash` / `gemini-3.5-flash-lite`) with zero-external-dependency fallback.
+- **LLM Engine**: Google Gemini (`gemini-3.5-flash-lite`) for intent expansion and rationale generation, with resilient zero-dependency fallback.
 
 ### Frontend
 - **HTML5 & Vanilla JavaScript**: Single Page Application (SPA) architecture with zero framework overhead.
@@ -199,11 +199,18 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-### Step 4: Configure Environment (Optional)
+### Step 4: Configure Environment & Gemini API Key (Optional)
+Copy `.env.example` to `.env`:
 ```bash
 cp .env.example .env
 ```
-*(Note: If no Gemini API key is provided, the application automatically uses its built-in deterministic semantic reasoning engine without crashing).*
+
+To enable dynamic LLM intent expansion and personalized recommendation rationales with Google Gemini, add your API key in `.env`:
+```env
+GEMINI_API_KEY=your_gemini_api_key_here
+```
+
+> **Zero-Dependency Fallback:** An external API key is **completely optional**. If left blank, the system automatically uses its built-in deterministic semantic reasoning engine without external network dependencies.
 
 ### Step 5: Launch the Application
 ```bash
