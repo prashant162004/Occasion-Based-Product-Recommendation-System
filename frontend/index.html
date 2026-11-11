@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Occasion-Based Product Recommendation System</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Plus Jakarta Sans', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    };
+  </script>
+  <link rel="stylesheet" href="/static/styles.css?v=12">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+</head>
+<body class="bg-slate-950 dark:bg-slate-950 text-slate-100 dark:text-slate-100 min-h-screen flex flex-col antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-300">
+
+  <!-- Navigation Header -->
+  <header class="border-b border-slate-800 dark:border-slate-800 bg-slate-900/80 dark:bg-slate-900/80 backdrop-blur-md sticky top-0 z-50 header-theme transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="h-9 w-9 rounded-xl bg-gradient-to-br from-indigo-500 to-indigo-700 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/25">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-base font-bold tracking-tight header-title">OccasionRecommender</h1>
+          <p class="text-[11px] header-subtitle font-medium">AI-Powered Semantic Discovery Engine</p>
+        </div>
+      </div>
+      
+      <div class="flex items-center space-x-3 text-xs">
+        <!-- Theme Toggle Button -->
+        <button 
+          id="theme-toggle-btn"
+          onclick="toggleTheme()"
+          type="button"
+          class="theme-toggle-btn p-2 rounded-xl border transition-all shadow-sm flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          title="Toggle Dark / Light Mode"
+          aria-label="Toggle Theme"
+        >
+          <!-- Sun icon (shown in dark mode) -->
+          <svg id="theme-sun-icon" class="w-4 h-4 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <!-- Moon icon (shown in light mode) -->
+          <svg id="theme-moon-icon" class="w-4 h-4 text-indigo-600 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+        </button>
+
+        <span class="status-pill inline-flex items-center px-2.5 py-1 rounded-full border">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span>
+          Vector Store Active
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 flex flex-col space-y-8">
+
+    <!-- Hero & Prominent Search Input Section -->
+    <section class="max-w-3xl mx-auto w-full text-center space-y-6">
+      <div class="space-y-2">
+        <h2 class="text-2xl sm:text-4xl font-extrabold tracking-tight hero-heading">
+          Find the Perfect Gifts for Any Occasion
+        </h2>
+        <p class="text-sm sm:text-base hero-subheading">
+          Intelligently matched using dense semantic vector search and deep contextual re-ranking.
+        </p>
+      </div>
+
+      <!-- Search Input Form -->
+      <form id="search-form" class="relative group" onsubmit="handleSearch(event)">
+        <div class="search-box-container relative flex items-center rounded-2xl border transition-all overflow-hidden">
+          <div class="pl-4 search-icon">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <input 
+            type="text" 
+            id="occasion-input" 
+            name="occasion" 
+            required 
+            placeholder="Enter an occasion (e.g. Wedding, Diwali, Birthday, Valentine's Day, Office Party)..."
+            autocomplete="off"
+            class="search-input w-full bg-transparent py-4 pl-3 pr-28 text-sm sm:text-base font-medium focus:outline-none"
+          >
+          <div class="absolute right-2 flex items-center space-x-1">
+            <button 
+              type="button" 
+              id="clear-btn" 
+              onclick="clearInput()" 
+              class="hidden p-2 text-slate-400 hover:text-slate-600 dark:hover:text-white transition-colors"
+              title="Clear input"
+            >
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <button 
+              type="submit" 
+              id="search-btn"
+              class="inline-flex items-center px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 font-semibold text-xs sm:text-sm text-white shadow-md shadow-indigo-600/25 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
+              <span id="btn-text">Search</span>
+              <svg id="btn-spinner" class="hidden animate-spin ml-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+      </form>
+
+      <!-- Occasion Quick Select Chips (Strictly Text Only, No Emojis) -->
+      <div class="space-y-2">
+        <p class="text-xs uppercase tracking-wider chips-label font-bold">Popular Occasions</p>
+        <div id="chips-container" class="flex flex-wrap items-center justify-center gap-2">
+          <!-- Dynamically populated chips -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Results Status & Metrics Bar (Visible when search is performed) -->
+    <section id="metrics-bar" class="hidden metrics-bar-theme border rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-xs transition-colors duration-300">
+      <div class="flex items-center space-x-2">
+        <span class="inline-block w-2.5 h-2.5 rounded-full bg-indigo-500 shadow-sm shadow-indigo-500/50"></span>
+        <span id="metrics-title" class="font-semibold metrics-title-text">Recommendations Ready</span>
+        <span class="metrics-separator">|</span>
+        <span id="metrics-latency" class="metrics-latency-text font-medium">Latency: 0ms</span>
+      </div>
+      <div class="flex items-center space-x-3 w-full sm:w-auto justify-between sm:justify-end">
+        <label for="category-filter" class="filter-label font-semibold">Filter Category:</label>
+        <select id="category-filter" onchange="filterByCategory()" class="category-select border rounded-xl px-3 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/50">
+          <option value="">All Categories</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- Occasion Insight Summary Banner -->
+    <div id="summary-banner" class="hidden summary-banner-theme rounded-2xl border p-4 transition-colors duration-300">
+      <div class="flex items-start space-x-3">
+        <div class="summary-icon-box p-1.5 rounded-lg mt-0.5">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <h4 class="text-xs font-bold uppercase tracking-wider summary-title">Occasion Synthesis</h4>
+          <p id="summary-text" class="text-sm summary-body mt-1 leading-relaxed"></p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Product Results Grid (Directly below input field as required) -->
+    <section id="results-section" class="w-full">
+      <div id="loading-skeleton" class="hidden grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- 4 Skeletons -->
+        <div class="skeleton-card rounded-2xl h-96"></div>
+        <div class="skeleton-card rounded-2xl h-96"></div>
+        <div class="skeleton-card rounded-2xl h-96"></div>
+        <div class="skeleton-card rounded-2xl h-96"></div>
+      </div>
+
+      <!-- Empty State -->
+      <div id="empty-state" class="hidden text-center py-16 px-4 max-w-md mx-auto space-y-4">
+        <div class="empty-icon-box h-16 w-16 mx-auto rounded-full border flex items-center justify-center">
+          <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div class="space-y-1">
+          <h3 class="text-base font-bold empty-heading">No Matching Products Found</h3>
+          <p class="text-xs empty-desc" id="empty-state-message">
+            We could not find any products in our catalog matching this occasion. Try searching for Birthday, Wedding, Diwali, or Valentine's Day.
+          </p>
+        </div>
+      </div>
+
+      <!-- Product Cards Grid -->
+      <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        <!-- Injected via JavaScript -->
+      </div>
+
+      <!-- Load More Action Container -->
+      <div id="load-more-container" class="hidden text-center pt-8 pb-4">
+        <button 
+          id="load-more-btn"
+          onclick="handleLoadMore()"
+          class="inline-flex items-center space-x-2 px-6 py-3 rounded-xl bg-indigo-600 hover:bg-indigo-500 active:bg-indigo-700 text-white font-semibold text-xs shadow-lg shadow-indigo-500/25 transition-all hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-indigo-400"
+        >
+          <span id="load-more-text">Load More Products</span>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <p id="all-loaded-text" class="hidden text-xs italic font-medium pt-2 text-slate-500">
+          All matching recommendations displayed
+        </p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Footer -->
+  <footer class="footer-theme border-t py-6 text-center text-xs transition-colors duration-300">
+    <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p class="footer-primary font-medium">Occasion-Based Product Recommendation System &bull; Technical Assignment Implementation</p>
+      <p class="footer-secondary">Dense Vector Search &bull; Cross-Encoder Re-ranking &bull; AI Semantic Synthesis</p>
+    </div>
+  </footer>
+
+  <script src="/static/app.js?v=13"></script>
+</body>
+</html>

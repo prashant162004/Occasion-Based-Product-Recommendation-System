@@ -1,0 +1,25 @@
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+
+# Storage & Data
+vector_storage/
+*.log
+
+# Task Document Confidentiality (Assignment Rule 8)
+*.pdf
+
+# Scratch & Dev
+list_prods.py
+test_mapping.py
+
+# Environment variables
+.env
+
+# OS
+.DS_Store
+Thumbs.db

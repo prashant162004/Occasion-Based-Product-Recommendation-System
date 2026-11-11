@@ -1,0 +1,529 @@
+/* Typography & Global Transitions */
+body {
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* =========================================================
+   LIGHT THEME VARIABLES & OVERRIDES
+   ========================================================= */
+html:not(.dark) body {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+html:not(.dark) .header-theme {
+  background-color: rgba(255, 255, 255, 0.88);
+  border-color: #e2e8f0;
+}
+
+html:not(.dark) .header-title {
+  color: #0f172a;
+}
+
+html:not(.dark) .header-subtitle {
+  color: #64748b;
+}
+
+html:not(.dark) .nav-link {
+  color: #475569;
+}
+
+html:not(.dark) .nav-link:hover {
+  color: #4f46e5;
+}
+
+html:not(.dark) .theme-toggle-btn {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+html:not(.dark) .theme-toggle-btn:hover {
+  background-color: #e2e8f0;
+  color: #0f172a;
+}
+
+html:not(.dark) .status-pill {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #334155;
+}
+
+html:not(.dark) .hero-heading {
+  color: #0f172a;
+}
+
+html:not(.dark) .hero-subheading {
+  color: #64748b;
+}
+
+html:not(.dark) .chips-label {
+  color: #64748b;
+}
+
+html:not(.dark) .search-box-container {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+}
+
+html:not(.dark) .search-box-container:focus-within {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.2);
+}
+
+html:not(.dark) .search-icon {
+  color: #64748b;
+}
+
+html:not(.dark) .search-input {
+  color: #0f172a;
+}
+
+html:not(.dark) .search-input::placeholder {
+  color: #94a3b8;
+}
+
+html:not(.dark) .occasion-chip {
+  background-color: #ffffff;
+  border-color: #cbd5e1;
+  color: #475569;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+html:not(.dark) .occasion-chip:hover {
+  background-color: #f1f5f9;
+  color: #0f172a;
+  border-color: #94a3b8;
+}
+
+html:not(.dark) .occasion-chip.active {
+  background-color: #4f46e5;
+  color: #ffffff;
+  border-color: #4338ca;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.35);
+}
+
+html:not(.dark) .metrics-bar-theme {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05);
+}
+
+html:not(.dark) .metrics-title-text {
+  color: #0f172a;
+}
+
+html:not(.dark) .metrics-separator {
+  color: #cbd5e1;
+}
+
+html:not(.dark) .metrics-latency-text {
+  color: #64748b;
+}
+
+html:not(.dark) .filter-label {
+  color: #475569;
+}
+
+html:not(.dark) .category-select {
+  background-color: #f8fafc;
+  border-color: #cbd5e1;
+  color: #1e293b;
+}
+
+html:not(.dark) .summary-banner-theme {
+  background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 100%);
+  border-color: #c7d2fe;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.04);
+}
+
+html:not(.dark) .summary-icon-box {
+  background-color: rgba(99, 102, 241, 0.15);
+  color: #4f46e5;
+}
+
+html:not(.dark) .summary-title {
+  color: #4338ca;
+}
+
+html:not(.dark) .summary-body {
+  color: #334155;
+}
+
+html:not(.dark) .product-card {
+  background-color: #ffffff;
+  border-color: #e2e8f0;
+  box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.04);
+}
+
+html:not(.dark) .product-card:hover {
+  border-color: #818cf8;
+  box-shadow: 0 16px 32px -8px rgba(99, 102, 241, 0.18), 0 0 0 1px rgba(99, 102, 241, 0.3);
+}
+
+html:not(.dark) .card-title {
+  color: #0f172a;
+}
+
+html:not(.dark) .card-brand {
+  color: #4f46e5;
+}
+
+html:not(.dark) .card-desc {
+  color: #64748b;
+}
+
+html:not(.dark) .card-rationale-box {
+  background-color: #f8fafc;
+  border-color: #e2e8f0;
+  border-left-color: #6366f1;
+}
+
+html:not(.dark) .card-rationale-title {
+  color: #64748b;
+}
+
+html:not(.dark) .card-rationale-text {
+  color: #334155;
+}
+
+html:not(.dark) .card-price {
+  color: #0f172a;
+}
+
+html:not(.dark) .card-stock {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+  color: #475569;
+}
+
+html:not(.dark) .card-category-badge {
+  background-color: rgba(255, 255, 255, 0.9);
+  color: #1e293b;
+  border-color: #cbd5e1;
+}
+
+html:not(.dark) .footer-theme {
+  background-color: rgba(255, 255, 255, 0.85);
+  border-color: #e2e8f0;
+}
+
+html:not(.dark) .footer-primary {
+  color: #475569;
+}
+
+html:not(.dark) .footer-secondary {
+  color: #64748b;
+}
+
+html:not(.dark) .empty-icon-box {
+  background-color: #f1f5f9;
+  border-color: #e2e8f0;
+  color: #94a3b8;
+}
+
+html:not(.dark) .empty-heading {
+  color: #0f172a;
+}
+
+html:not(.dark) .empty-desc {
+  color: #64748b;
+}
+
+html:not(.dark) .skeleton-card {
+  background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+  background-size: 200% 100%;
+}
+
+
+/* =========================================================
+   DARK THEME VARIABLES & DEFAULTS
+   ========================================================= */
+html.dark body {
+  background-color: #020617;
+  color: #f8fafc;
+}
+
+html.dark .header-theme {
+  background-color: rgba(15, 23, 42, 0.82);
+  border-color: #1e293b;
+}
+
+html.dark .header-title {
+  color: #ffffff;
+}
+
+html.dark .header-subtitle {
+  color: #94a3b8;
+}
+
+html.dark .nav-link {
+  color: #94a3b8;
+}
+
+html.dark .nav-link:hover {
+  color: #ffffff;
+}
+
+html.dark .theme-toggle-btn {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #e2e8f0;
+}
+
+html.dark .theme-toggle-btn:hover {
+  background-color: #334155;
+  color: #ffffff;
+}
+
+html.dark .status-pill {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+html.dark .hero-heading {
+  color: #ffffff;
+}
+
+html.dark .hero-subheading {
+  color: #94a3b8;
+}
+
+html.dark .chips-label {
+  color: #94a3b8;
+}
+
+html.dark .search-box-container {
+  background-color: #0f172a;
+  border-color: rgba(51, 65, 85, 0.8);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+}
+
+html.dark .search-box-container:focus-within {
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+html.dark .search-icon {
+  color: #64748b;
+}
+
+html.dark .search-input {
+  color: #ffffff;
+}
+
+html.dark .search-input::placeholder {
+  color: #475569;
+}
+
+html.dark .occasion-chip {
+  background-color: #0f172a;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+html.dark .occasion-chip:hover {
+  background-color: #1e293b;
+  color: #ffffff;
+  border-color: #64748b;
+}
+
+html.dark .occasion-chip.active {
+  background-color: #4f46e5;
+  color: #ffffff;
+  border-color: #6366f1;
+  box-shadow: 0 0 16px rgba(99, 102, 241, 0.45);
+}
+
+html.dark .metrics-bar-theme {
+  background-color: rgba(15, 23, 42, 0.75);
+  border-color: #1e293b;
+}
+
+html.dark .metrics-title-text {
+  color: #e2e8f0;
+}
+
+html.dark .metrics-separator {
+  color: #334155;
+}
+
+html.dark .metrics-latency-text {
+  color: #94a3b8;
+}
+
+html.dark .filter-label {
+  color: #94a3b8;
+}
+
+html.dark .category-select {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #cbd5e1;
+}
+
+html.dark .summary-banner-theme {
+  background: linear-gradient(135deg, rgba(49, 46, 129, 0.35) 0%, rgba(15, 23, 42, 0.95) 100%);
+  border-color: rgba(99, 102, 241, 0.35);
+}
+
+html.dark .summary-icon-box {
+  background-color: rgba(99, 102, 241, 0.2);
+  color: #818cf8;
+}
+
+html.dark .summary-title {
+  color: #a5b4fc;
+}
+
+html.dark .summary-body {
+  color: #cbd5e1;
+}
+
+html.dark .product-card {
+  background-color: #0f172a;
+  border-color: #1e293b;
+}
+
+html.dark .product-card:hover {
+  border-color: rgba(99, 102, 241, 0.5);
+  box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(99, 102, 241, 0.35);
+}
+
+html.dark .card-title {
+  color: #ffffff;
+}
+
+html.dark .card-brand {
+  color: #818cf8;
+}
+
+html.dark .card-desc {
+  color: #94a3b8;
+}
+
+html.dark .card-rationale-box {
+  background-color: rgba(2, 6, 23, 0.65);
+  border-color: #1e293b;
+  border-left-color: #6366f1;
+}
+
+html.dark .card-rationale-title {
+  color: #94a3b8;
+}
+
+html.dark .card-rationale-text {
+  color: #cbd5e1;
+}
+
+html.dark .card-price {
+  color: #ffffff;
+}
+
+html.dark .card-stock {
+  background-color: #1e293b;
+  border-color: #334155;
+  color: #94a3b8;
+}
+
+html.dark .card-category-badge {
+  background-color: rgba(2, 6, 23, 0.85);
+  color: #cbd5e1;
+  border-color: rgba(51, 65, 85, 0.7);
+}
+
+html.dark .footer-theme {
+  background-color: rgba(15, 23, 42, 0.6);
+  border-color: #1e293b;
+}
+
+html.dark .footer-primary {
+  color: #94a3b8;
+}
+
+html.dark .footer-secondary {
+  color: #64748b;
+}
+
+html.dark .empty-icon-box {
+  background-color: rgba(30, 41, 59, 0.7);
+  border-color: #334155;
+  color: #64748b;
+}
+
+html.dark .empty-heading {
+  color: #ffffff;
+}
+
+html.dark .empty-desc {
+  color: #94a3b8;
+}
+
+html.dark .skeleton-card {
+  background: linear-gradient(90deg, #0f172a 25%, #1e293b 50%, #0f172a 75%);
+  background-size: 200% 100%;
+}
+
+
+/* =========================================================
+   CARD HOVER, ZOOM & MICRO-INTERACTIONS
+   ========================================================= */
+.product-card {
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+              box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), 
+              border-color 0.25s ease,
+              background-color 0.3s ease;
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+}
+
+.product-image {
+  transition: transform 0.45s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.06);
+}
+
+/* Occasion Chips Transition */
+.occasion-chip {
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Skeleton Loading Shimmer */
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeleton-card {
+  animation: shimmer 1.6s infinite ease-in-out;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #475569;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #64748b;
+}
