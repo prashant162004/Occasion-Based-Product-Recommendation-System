@@ -1,92 +1,101 @@
 # Occasion-Based Product Recommendation System
 
-An intelligent, production-grade AI/ML recommendation engine that suggests contextually relevant products from a catalog based on user-entered occasions (e.g., *Birthday, Wedding, Diwali, Valentine's Day, Office Party, Housewarming, Baby Shower*).
-
-Built for the **AI/ML Engineer Take-Home Assignment**.
+An intelligent, end-to-end semantic product recommendation engine that matches e-commerce catalog items to user occasions (e.g., *Diwali, Weddings, Birthdays, Housewarming, Baby Showers, Office Parties*) using dense vector retrieval, cross-encoder re-ranking, and dynamic LLM intent expansion.
 
 ---
 
-## 1. Architecture Overview
+## 1. Problem Overview: Why Occasion Search is Hard
 
-The system implements a state-of-the-art **Two-Stage Hybrid Retrieval & Re-ranking Architecture** paired with an **LLM Semantic Synthesis Engine**:
+In standard e-commerce platforms, search systems rely heavily on lexical keyword matching (BM25, inverted indices). However, **occasion-based shopping suffers from severe semantic vocabulary mismatch**:
+
+- A user searching for **"Diwali"** is looking for festive gift hampers, brass diyas, marigold garlands, ethnic attire, and dry fruits. But catalog product titles rarely contain the literal word *"Diwali"*.
+- A user searching for **"Housewarming"** expects plant-based scented candles, indoor plants, or home decor, not products with "housewarming" in their title.
+- A user searching for compound queries like **"Diwali, Housewarming"** needs recommendations that blend festive celebration with welcoming home decor.
+
+### Why not use a single LLM to rank the entire catalog?
+Passing hundreds or thousands of product descriptions to a large language model on every user request introduces heavy latency (> 3-5 seconds), high token costs, and context window bottlenecks.
+
+### The Solution
+A **Two-Stage Hybrid Retrieval & Re-ranking Architecture**:
+1. **Bi-Encoder Dense Vector Retrieval (Qdrant)**: High-speed candidate generation retrieving the top relevant items in sub-20ms.
+2. **Cross-Encoder Re-Ranking (MiniLM)**: Full joint token cross-attention scoring to precision-rank the candidate items.
+3. **LLM Semantic Synthesizer (Google Gemini)**: Real-time query expansion, multi-occasion intent decoding, and per-card explainable recommendation rationales.
+
+---
+
+## 2. System Architecture
 
 ```
-[User Occasion Query] (e.g. "Diwali", "Wedding", "Diwali, Housewarming")
+[User Occasion Query]  (e.g., "Diwali", "Wedding", "Diwali, Housewarming")
           │
           ▼
-┌────────────────────────────────────────────────────────┐
-│ Stage 1: AI Occasion Intent Expansion (Google Gemini)  │
-│ • Decodes occasion context, themes, and gift keywords  │
-│ • Handles compound / multi-occasion queries seamlessly │
-└─────────────────────────┬──────────────────────────────┘
-                          │
-                          ▼
-┌────────────────────────────────────────────────────────┐
-│ Stage 2: Dense Vector Retrieval (Qdrant Vector DB)     │
-│ • Model: BAAI/bge-m3 (1024-dimensional dense vectors)  │
-│ • Cosine similarity search over product embeddings     │
-│ • Sub-20ms candidate retrieval                         │
-└─────────────────────────┬──────────────────────────────┘
-                          │ Top Candidates
-                          ▼
-┌────────────────────────────────────────────────────────┐
-│ Stage 3: Deep Cross-Encoder Re-ranking                 │
-│ • Model: cross-encoder/ms-marco-MiniLM-L-6-v2          │
-│ • Deep Query-Product cross-attention interaction score │
-│ • Precision ordering with dynamic rank calibration     │
-└─────────────────────────┬──────────────────────────────┘
-                          │ Ranked Candidates
-                          ▼
-┌────────────────────────────────────────────────────────┐
-│ Stage 4: LLM-as-a-Judge & Rationale Synthesis (Gemini) │
-│ • Filters out conflicting occasion/theme items         │
-│ • Generates per-card "Recommendation Rationale"        │
-│ • Synthesizes overall Occasion Strategy Summary        │
-└─────────────────────────┬──────────────────────────────┘
-                          │
-                          ▼
-          [Polished Responsive Web UI Grid]
+┌──────────────────────────────────────────────────────────────────┐
+│ Stage 1: Dynamic Occasion Intent Expansion (Google Gemini)        │
+│ • Decodes occasion context, tone, and cultural gifting themes    │
+│ • Seamlessly handles compound queries (comma-separated occasions)│
+│ • Generates e-commerce targeted search vectors and keywords      │
+└─────────────────────────────────┬────────────────────────────────┘
+                                  │
+                                  ▼
+┌──────────────────────────────────────────────────────────────────┐
+│ Stage 2: Dense Vector Retrieval (Qdrant Vector Database)         │
+│ • Embedding Model: BAAI/bge-m3 (1024-dimensional dense vectors) │
+│ • High-speed Cosine Similarity Search over catalog embeddings    │
+│ • Sub-20ms Candidate Retrieval (< 20ms latency)                  │
+└─────────────────────────────────┬────────────────────────────────┘
+                                  │ Top Candidates
+                                  ▼
+┌──────────────────────────────────────────────────────────────────┐
+│ Stage 3: Deep Interaction Re-ranking (Neural Cross-Encoder)      │
+│ • Model: cross-encoder/ms-marco-MiniLM-L-6-v2                    │
+│ • Joint Query-Product Cross-Attention Rescoring                  │
+│ • Eliminates false positives and optimizes precision ordering    │
+└─────────────────────────────────┬────────────────────────────────┘
+                                  │ Ranked Candidates
+                                  ▼
+┌──────────────────────────────────────────────────────────────────┐
+│ Stage 4: Calibration & Explainable Rationale Generation          │
+│ • Dynamic Score Calibration: 70% model relevance + 30% rank decay│
+│ • Gemini synthesizes a tailored 1-sentence "Why This Fits" note   │
+│ • Generates overall Occasion Strategy Summary banner             │
+└─────────────────────────────────┬────────────────────────────────┘
+                                  │
+                                  ▼
+         [Interactive Web UI Grid (FastAPI + Tailwind CSS)]
 ```
 
 ---
 
-## 2. Recommendation Logic & Design Decisions
+## 3. Key Capabilities
 
-In accordance with **Section 3.3 of the Assignment Specification**, here is the design rationale for our hybrid approach:
-
-### Why not pure Keyword / Rule-Based Matching?
-Traditional keyword search fails significantly on occasion discovery because catalogs rarely contain the occasion word itself. For example, for *"Diwali"*, premium products like *"Marigold Festive Flower Set"*, *"Handcrafted Brass Diyas"*, or *"Dry Fruit Sweet Box"* rarely mention the literal word "Diwali" in their title or description. Keyword matching yields empty results or false negatives.
-
-### Why not a Brute-Force Single LLM Call?
-Passing an entire catalog of products to an LLM on every user query introduces unacceptable latency (> 3-5 seconds), high API token costs, and context window limits as the catalog scales to thousands of items.
-
-### The Solution: Hybrid 4-Stage Multi-Model Pipeline
-1. **AI Query Expansion**: When a user enters an occasion (e.g., *"Diwali"* or *"Baby Shower"*), Google Gemini expands it into contextual themes, cultural gift motifs, and e-commerce keywords.
-2. **Dense Bi-Encoder Retrieval**: The `BAAI/bge-m3` embedding model projects product metadata and occasion semantics into a shared 1024-dimensional vector space, indexed inside an embedded local **Qdrant** vector store. Cosine similarity retrieves the top relevant candidates in $< 20\text{ms}$.
-3. **Neural Cross-Encoder Re-ranking**: The top candidates pass through `cross-encoder/ms-marco-MiniLM-L-6-v2`, which performs full joint token cross-attention over `[Query, Product]` pairs.
-4. **Dynamic Score Calibration**: Re-ranker logits are calibrated into intuitive percentage match scores:
-   $$\text{Score} = 0.70 \times \text{ModelRelevance} + 0.30 \times \text{RankDecay}$$
-   ensuring smooth, monotonic, descending match badges (e.g. 96%, 84%, 72%).
-5. **LLM-as-a-Judge & Rationale Generator**: Gemini generates a contextual 1-2 sentence explanation on each card detailing *why* the product suits that specific occasion, and generates an overarching occasion synthesis strategy banner.
+- **Natural Semantic Understanding**: Understands cultural and emotional context of occasions rather than requiring exact keyword matches.
+- **Compound Multi-Occasion Search**: Supports comma-separated multi-occasion inputs (e.g., *"Diwali, Housewarming"*) by dynamically combining intent vectors.
+- **Two-Stage High-Performance Pipeline**: Sub-20ms dense vector retrieval paired with deep cross-attention re-ranking for enterprise-grade relevance.
+- **Dynamic Score Calibration**: Raw model logits are normalized into smooth, descending percentage match badges:
+  $$\text{Match Percentage} = 0.70 \times \text{ModelRelevance} + 0.30 \times \text{RankDecay}$$
+  producing intuitive scores like 96%, 90%, 77%, 75%.
+- **Explainable AI (Recommendation Rationales)**: Every product card displays a dedicated justification explaining specifically why that item matches the entered occasion.
+- **Zero-Dependency Fallback Engine**: If no Gemini API key is provided, the application automatically switches to its built-in deterministic semantic engine without failing or crashing.
+- **Modern Responsive Web UI**: Single Page Application (SPA) built with Tailwind CSS, clean typography, 1-click occasion chips, dark/light theme toggle, and zero page reloads.
 
 ---
 
-## 3. Product Data Structure & Payload Parsing
+## 4. Catalog Data Schema & Ingestion
 
-The system reads and processes the catalog strictly following **Section 2 of the Assignment Document**:
+The product catalog (`data/products.json`) is loaded and normalized through `backend/app/utils/data_loader.py`:
 
 | Field | Type | Description | System Usage |
 |---|---|---|---|
 | `product_id` / `productId` | `string` / `int` | Unique product identifier | Primary key for vector indexing & card identification |
 | `vendor_id` / `vendorId` | `string` / `int` | Vendor identifier | Tracked in metadata payload |
-| `vendor_category` | `string` | Category slug/code | Categorization & internal classification |
+| `vendor_category` | `string` | Category slug/code | Categorization and internal classification |
 | `vendor_category_desc` | `string` | Human-readable category description | Rendered on product card badge & embedded in semantic vector |
 | `title` | `string` | Product title | Displayed prominently, tokenized for bi-encoder & cross-encoder |
 | `description` | `string` | Product description | Formatted as card snippet & embedded into semantic vector |
-| `files` | `list` | Images / media files array | Extracted URL for high-resolution card product image |
+| `files` | `list` | Product images / media array | Extracted URL for high-resolution card product image |
 
 ```python
-# Exact ingestion mapping implemented in backend/app/utils/data_loader.py
+# Payload extraction logic (backend/app/utils/data_loader.py)
 product_id = payload.get("product_id") or payload.get("productId")
 vendor_id = payload.get("vendor_id") or payload.get("vendorId")
 vendor_category = payload.get("vendor_category")
@@ -98,35 +107,19 @@ files = payload.get("files", [])
 
 ---
 
-## 4. Key Assignment Requirements Fulfillment
-
-| Requirement | Implementation Detail | Status |
-|---|---|---|
-| **Occasion Input Field** | Prominent search bar with real-time text input and 1-click occasion chips (*Birthday, Wedding, Diwali, Valentine's Day, Office Party, Housewarming, Baby Shower*). | Fulfilled |
-| **Multi-Occasion Search** | Supports compound queries via comma separation (e.g., *"Diwali, Housewarming"*). | Fulfilled |
-| **Visible Action Trigger** | Action button with loading state, keyboard `Enter` trigger, and clickable occasion chips. | Fulfilled |
-| **Ranked Results Rendering** | Dynamic responsive grid strictly below the input field on the same page with zero reload. | Fulfilled |
-| **Required Card Fields** | Product Title, Category, Description Snippet, Image (with fallback SVG), Price, Brand, Stock Status. | Fulfilled |
-| **Empty State Handling** | Clean empty-state view with actionable suggestions when no catalog items match the query. | Fulfilled |
-| **Bonus: Vector Search** | Embedded local **Qdrant** vector store computing cosine similarity. | **Bonus Achieved** |
-| **Bonus: Semantic Embeddings** | `BAAI/bge-m3` (1024-dim dense vectors) mapping semantic occasion context to items. | **Bonus Achieved** |
-| **Bonus: Polished UI Design** | Responsive glassmorphic layout, clean typography (*Plus Jakarta Sans*), smooth shimmers. | **Bonus Achieved** |
-
----
-
 ## 5. Technology Stack
 
 ### Backend
 - **Python 3.12**
-- **FastAPI**: Asynchronous REST API framework with automated OpenAPI / Swagger documentation.
-- **Uvicorn**: ASGI web server with auto-reloading capability.
+- **FastAPI**: Asynchronous REST framework with OpenAPI / Swagger documentation.
+- **Uvicorn**: ASGI production web server.
 - **Pydantic v2**: Strict schema validation and data serialization.
 
 ### Machine Learning & Vector Search
 - **Vector Database**: Embedded disk-backed **Qdrant** (`qdrant-client`).
-- **Bi-Encoder Embeddings**: `BAAI/bge-m3` (1024-dimensional normalized dense vectors via `sentence-transformers`).
+- **Dense Embedding Model**: `BAAI/bge-m3` (1024-dimensional normalized dense vectors via `sentence-transformers`).
 - **Cross-Encoder Re-ranker**: `cross-encoder/ms-marco-MiniLM-L-6-v2` for cross-attention scoring.
-- **LLM Engine**: Google Gemini (`gemini-3.5-flash-lite`) for intent expansion and rationale generation, with resilient zero-dependency fallback.
+- **LLM Engine**: Google Gemini (`gemini-3.5-flash-lite`) via REST transport for intent expansion and rationale synthesis.
 
 ### Frontend
 - **HTML5 & Vanilla JavaScript**: Single Page Application (SPA) architecture with zero framework overhead.
@@ -171,7 +164,7 @@ Recommendation_system/
 
 ---
 
-## 7. Installation & Setup Instructions
+## 7. Installation & Quickstart Guide
 
 ### Prerequisites
 - Python 3.9+ (Python 3.12 recommended)
@@ -221,11 +214,11 @@ The application will start on:
 **http://127.0.0.1:8000**
 
 - **Interactive Web UI**: [http://127.0.0.1:8000](http://127.0.0.1:8000)
-- **API Documentation**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
+- **Interactive Swagger API Docs**: [http://127.0.0.1:8000/docs](http://127.0.0.1:8000/docs)
 
 ---
 
-## 8. API Documentation
+## 8. API Reference
 
 ### POST `/api/recommend`
 Executes semantic occasion recommendation.
@@ -267,45 +260,40 @@ Executes semantic occasion recommendation.
 }
 ```
 
-### GET `/api/occasions`
-Returns predefined occasion chips for 1-click filtering.
-
-### GET `/api/categories`
-Returns unique categories present in the catalog.
-
-### GET `/api/health`
-Returns service and vector store indexing status.
+### Auxiliary Endpoints
+- `GET /api/occasions`: Returns predefined occasion chips for 1-click filtering.
+- `GET /api/categories`: Returns unique categories present in the catalog.
+- `GET /api/health`: Returns service status and vector store indexing health.
 
 ---
 
-## 9. Running Tests
+## 9. Automated Testing & Verification
 
-Execute the automated test suite with pytest:
+Run the automated test suite with pytest:
 ```bash
 pytest tests/ -v
 ```
 
 All 5 core pipeline test suites verify:
-- Catalog schema parsing and extraction
-- Dense vector embedding generation
-- Vector store similarity search
-- Cross-encoder re-ranking
-- End-to-end pipeline execution
+- **Catalog schema parsing**: Validates extraction of all product attributes.
+- **Dense vector embeddings**: Validates 1024-dimensional normalized vector generation with `BAAI/bge-m3`.
+- **Vector store retrieval**: Verifies embedded Qdrant cosine similarity candidate search.
+- **Cross-encoder re-ranking**: Confirms neural cross-attention rescoring and score ordering.
+- **End-to-end pipeline execution**: Tests end-to-end flow from raw query string to structured output cards.
 
 ---
 
-## 10. Open Source Tools & Citations
+## 10. Open Source References & Citations
 
-In accordance with **Section 8 of the Assignment Document**, the following open-source libraries and pre-trained models are utilized:
-- **FastAPI & Uvicorn**: High-performance web framework (Sebastián Ramírez).
-- **Sentence-Transformers**: Dense embeddings and neural cross-encoders (UKPLab / Nils Reimers).
-- **BAAI/bge-m3**: Multilingual dense representation model (Beijing Academy of Artificial Intelligence).
-- **ms-marco-MiniLM-L-6-v2**: Cross-Encoder for information retrieval re-ranking.
-- **Qdrant Client**: Embedded vector search engine.
-- **Tailwind CSS**: Utility CSS framework.
+- **FastAPI & Uvicorn**: High-performance asynchronous web framework (Sebastián Ramírez).
+- **Sentence-Transformers**: Dense representations and cross-encoder implementations (UKPLab / Nils Reimers).
+- **BAAI/bge-m3**: Multilingual dense semantic embedding model (Beijing Academy of Artificial Intelligence).
+- **ms-marco-MiniLM-L-6-v2**: Pre-trained Cross-Encoder for information retrieval re-ranking.
+- **Qdrant Client**: Embedded vector search database.
+- **Tailwind CSS**: Utility-first CSS framework.
 
 ---
 
-## 11. AI Assistance Disclosure
+## 11. Notes
 
-As permitted by **Section 8 of the Assignment Document**, an AI coding assistant was used to assist in scaffolding boilerplate code and drafting documentation. All architectural decisions, pipeline design, ML model selection, scoring calibration, and implementations were thoroughly designed, reviewed, and verified.
+- **AI Tools Notice**: AI-assisted developer tooling was utilized for rapid code scaffolding, test boilerplate generation, and initial documentation drafting. All pipeline architecture, ML model choices, score calibration formulas, and system implementations were reviewed, refined, and verified.
